@@ -30,8 +30,6 @@ Añade las llaves que te proporciono el buró  a tu archivo `config.exs`:
 
 config :burox,
   buro_url: "BURO_HOST",
-  buro_user: "YPUR-BURO-USER",
-  buro_password: "YOUR-BURO-PASSWORD",
   buro_service: Burox.BuroService.Socket
 
 ```
@@ -40,9 +38,7 @@ Al momento de la publicación, el Buró solo soporta el servicio de prospector e
 Si necesitas usar `prospector`, añade los siguiente:
 
 ```elixir
-  buro_url_prospector: "PROSPECTOR-HOST",
-  buro_user_prospector: "YOUR-PROSPECTOR-USER",
-  buro_password_prospector: "YOUR-PROSPECTOR-PASSWORD"
+  buro_url_prospector: "PROSPECTOR-HOST"
 ```
 
 ### Petición
@@ -100,7 +96,7 @@ Esta recibe la petición y el tipo de prpducto que se requiere, por default, es 
 
 
 ```elixir
-Burox.solicitar(request, "507") 
+Burox.solicitar(request, tipo, %{user: user, password: password}) 
 ```
 
 Para otros tipos de productos, refiérase a la documentación que le proporcione Buró de Crédito

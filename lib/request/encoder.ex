@@ -12,41 +12,30 @@ defmodule Burox.Request.Encoder do
   recibido por el buró de crédito
   """
   @spec encode_buro(Request.t(), String.t(), boolean()) :: {:ok, term} | {:error, term}
-  def encode_buro(peticion, codigo_de_producto, special \\ false) do
+  def encode_buro(peticion, codigo_de_producto, credentials) do
     body =
       if peticion.autenticacion.cuenta_con_tarjeta_de_credito != nil do
         "#{build_authentication(peticion.autenticacion)}" <>
-          "#{build_header(codigo_de_producto, special)}" <> "#{build_body(peticion)}"
+          "#{build_header(codigo_de_producto, credentials)}" <> "#{build_body(peticion)}"
       else
-        "#{build_header(codigo_de_producto, special)}" <> "#{build_body(peticion)}"
+        "#{build_header(codigo_de_producto, credentials)}" <> "#{build_body(peticion)}"
       end
 
     body <> build_end(body)
   end
 
   # Crea el encabezado de la petición,
-  defp build_header(codigo_de_producto, special) do
-    {buro_user, buro_password, version} =
-    case special do
-      true ->
-        {
-          Application.get_env(:burox, :buro_user_special),
-          Application.get_env(:burox, :buro_password_special),
+  defp build_header(codigo_de_producto, %{user: buro_user, password: buro_password}) do
+    version =
+      case codigo_de_producto do
+        "107" ->
+          # El servicio de prospector solo esta disponible en la versión 11
+          "11"
+        _ ->
           "13"
-        }
-      false ->
-        case codigo_de_producto do
-          "107" ->
-            # El servicio de prospector solo esta disponible en la versión 11
-            {Application.get_env(:burox, :buro_user_prospector),
-              Application.get_env(:burox, :buro_password_prospector),
-              "11"}
-          _ ->
-            {Application.get_env(:burox, :buro_user),
-              Application.get_env(:burox, :buro_password),
-              "13"}
-        end
-    end
+      end
+
+
 
     if is_nil(buro_user) or is_nil(buro_password) do
       raise Burox.Error, message: "Deben configurarse las credenciales del Buró de Crédito"

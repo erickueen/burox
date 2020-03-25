@@ -18,7 +18,7 @@ defmodule Burox do
 
   """
   @spec solicitar(Request.t(), String.t(), boolean()) :: {:ok, term} | {:error, term}
-  def solicitar(data, codigo_producto \\"507", special \\ false) do
+  def solicitar(data, codigo_producto \\"507", credentials) do
     response_map = %{
       cadena_peticion: "",
       cadena_respuesta: ""
@@ -28,7 +28,7 @@ defmodule Burox do
     with {:ok, request} <- Validator.valid?(data) do
       buro_service = Application.get_env(:burox, :buro_service)
       # Convierte la petición a una cadena de texto
-      request_string = Encoder.encode_buro(request, codigo_producto, special)
+      request_string = Encoder.encode_buro(request, codigo_producto, credentials)
       # Solicita el buró
       with {:ok, buro_response} <- buro_service.post(request_string, codigo_producto) do
         parsed_response = Parser.process_response(buro_response)
